@@ -122,7 +122,7 @@ console.log(inc3(inc3(5)));   // 7
 
 console.log('\n twice\n------');
 /**
- * Write a function TWICE that takes a binary function and reutrns a unary function that passes its arg to the biunary function twice
+ * Write a function twice that takes a binary function and reutrns a unary function that passes its arg to the biunary function twice
  */
 function twice(binary) {
   return function (first) {
@@ -130,8 +130,10 @@ function twice(binary) {
   }
 }
 console.log(add(11, 11));   // 22
+
 const doubl = twice(add);
 console.log(doubl(11));     // 22
+
 const square = twice(mul);
 console.log(square(11));               // 121
 
