@@ -48,7 +48,7 @@ console.log(sum);  // 7
 console.log('\n curry\n------');
 /*
   Write a function curry that takes a binary function and an argument
-  and returns a dunction that can take a second argument
+  and returns a function that can take a second argument
 */
 function curry(fn, first) {
   return function (second) {
@@ -380,7 +380,7 @@ console.log(genF()); // undefined
 function filter(gen, filter) {
   return function recur() {
     let result = gen();
-    if (result == undefined  || filter(result)) {
+    if (result == undefined || filter(result)) {
       return result
     }
     return recur();
@@ -400,7 +400,7 @@ console.log('\n\concat\n------');
  * Write a concat factory that takes 2 generators and produces a generator that combines the sequences.
  */
 function concat(gen1, gen2) {
-  return function() {
+  return function () {
     const result1 = gen1();
     if (result1 === undefined) {
       return gen2();
@@ -415,3 +415,269 @@ console.log(gencon());    // 2
 console.log(gencon());    // 0
 console.log(gencon());    // 1
 console.log(gencon());    // undefined
+
+
+console.log('\n\gensymf\n------');
+/**
+ * Make a facorty gensymf that makes generators that make unique symbols.
+ */
+function gensymf(seed) {
+  const map = {};
+  return function () {
+    const current = map[seed] || 1;
+    map[seed] = current + 1;
+    return `${seed}${current}`
+  }
+}
+let geng = gensymf('G');
+let genh = gensymf('H');
+console.log(geng());  // 'G1'
+console.log(genh());  // 'H1'
+console.log(geng());  // 'G2'
+console.log(genh());  // 'G2'
+
+// his
+function gensymf(prefix) {
+  const gen = from(1);
+  return function () {
+    return `${prefix}${gen()}`
+  }
+}
+geng = gensymf('G');
+genh = gensymf('H');
+console.log(geng());  // 'G1'
+console.log(genh());  // 'H1'
+console.log(geng());  // 'G2'
+console.log(genh());  // 'G2'
+
+
+console.log('\n\gensymff\n------');
+/**
+ * Make a factory factory gensymff that takes a starting value and returns a factory
+ */
+function gensymff(start) {
+  return function (prefix) {
+    const gen = from(start);
+    return function () {
+      return `${prefix}${gen()}`
+    }
+  }
+}
+let gensymf2 = gensymff(1);
+let genffg = gensymf2('G');
+let genffh = gensymf2('H');
+console.log(genffg());  // 'G1'
+console.log(genffh());  // 'H1'
+console.log(genffg());  // 'G2'
+console.log(genffh());  // 'G2'
+
+
+
+console.log('\nfibonaccif\n------');
+/**
+ * Make a factory fibonaccif that returns a generator that will return the next fibonacci number
+ * sum of previous 2 numbers
+ */
+// TODO WRONG
+function fibonaccif(first, second) {
+  let idx = 0;
+  return function () {
+    switch (idx) {
+      case 0:
+        return 0;
+      case 1:
+        return 1;
+      default:
+        return first + second;
+    }
+
+  }
+  // function recur(first, second) {
+  //   console.log('idx', idx);
+  //   idx += 1;
+  //   if (idx < 2) {
+  //     return idx - 1;
+  //   }
+  //   const result = first + second;
+  //   console.log(second, result);
+  //   // return recur(second, result);
+  // }
+  // return function () {
+  //   return recur(first, second);
+  // }
+}
+
+const fib = fibonaccif(0, 1);
+console.log(fib());   //  0
+console.log(fib());   //  1
+console.log(fib());   //  1
+console.log(fib());   //  2
+console.log(fib());   //  3
+console.log(fib());   //  5
+
+
+console.log('\n counter\n------');
+/**
+ * Write a counter constructor that returns an objet containing 2 functions that implement an up/down counter, hiding the counter
+ */
+function counter() {
+  let counter = 0;
+  return {
+    up: function () {
+      counter += 1;
+      return counter;
+    },
+    down: function () {
+      counter -= 1;
+      return counter;
+    }
+  }
+}
+const object = counter();
+var up = object.up;
+var down = object.down;
+console.log(up());  // 1
+console.log(down());  // 0
+console.log(down());  // -1
+console.log(up());  // 0
+
+
+
+
+console.log('\n counter \n------');
+/**
+ * Make a revocable constructor that takes a binary function and returns an object containg an invoke function that can invoke the binary function and a revoke funtion that disables the invoke function
+ */
+function revocable(fn) {
+  let active = true;
+  return {
+    invoke: function (...args) {
+      return active ? fn(...args) : undefined;
+    },
+    revoke: function () {
+      active = false;
+    }
+  }
+}
+const rev = revocable(add);
+const add_rev = rev.invoke;
+console.log(add_rev(3, 4));     // 7
+rev.revoke();
+console.log(add_rev(5, 7));     // undefined
+
+
+
+
+
+function m(value, source) {
+  return {
+    value: value,
+    source: (typeof source === 'string') ? source : String(value)
+  };
+}
+
+
+console.log('\n addm \n------');
+function addm(a, b) {
+  return m(
+    a.value + b.value,
+    '(' + a.source + '+' + b.source + ')'
+  )
+}
+/**
+ * Write a function addm that takes two m objects and returns an m object
+ */
+const addm1 = JSON.stringify(addm(m(3), m(4)));   // {"value": 7, "source": "(3+4)"}
+const addm2 = JSON.stringify(addm(m(1), m(Math.PI, "pi")));   // {"value": 4.14159, "source": "(1+pi)"}
+console.log('addm1', addm1);
+console.log('addm2', addm2);
+
+
+console.log('\n liftm \n------');
+/**
+ * Write a function liftm that takes a binary dunction an a string and reutrns a fdunction that acts on m objects
+ *
+ * This is a 'nonad'
+ */
+function liftm(fn, operator) {
+  return function (a, b) {
+    return m(
+      fn(a.value, b.value),
+      '(' + a.source + operator + b.source + ')'
+    )
+  }
+}
+let addml = liftm(add, '+');
+let addml1 = JSON.stringify(addml(m(3), m(4)));   // {"value": 7, "source": "(3+4)"}
+console.log('addml1', addml1);
+
+let mulml = liftm(mul, "*");
+let addml2 = JSON.stringify(mulml(m(3), m(4)));   // {"value": 12, "source": "(3*4)"}
+console.log('addml2', addml2);
+
+
+
+console.log('\n liftm 2 \n------');
+/**
+ * Modify function liftm so that the functions it produces can accept args that are either numbers or m objects.
+ *
+ * This is a 'nonad'
+ */
+function liftm(fn, operator) {
+  return function (a, b) {
+    if (typeof a === 'number') {
+      a = m(a, a);
+    }
+    if (typeof b === 'number') {
+      b = m(b, b);
+    }
+    return m(
+      fn(a.value, b.value),
+      '(' + a.source + operator + b.source + ')'
+    )
+  }
+}
+addml = liftm(add, '+');
+addml1 = JSON.stringify(addml(m(3), m(4)));   // {"value": 7, "source": "(3+4)"}
+console.log('addml1 object', addml1);
+
+addml = liftm(add, '+');
+addml1 = JSON.stringify(addml(3, 4));   // {"value": 7, "source": "(3+4)"}
+console.log('addml1 number', addml1);
+
+
+
+console.log('\n liftm 2 \n------');
+/**
+ * Make a function continuize that takes a unary function and returns a function that takes a callback and an arg
+ *
+ * About to be enabled in JS.  No return function but instead pass in continuation function that gets called after (callback) with result
+ */
+function continuize(fn) {
+  return function (callback, ...args) {
+    callback(fn(...args));
+  }
+}
+const sqrtc = continuize(Math.sqrt);
+sqrtc(console.log, 81);       // 9
+
+
+
+/**
+ * lower case because ethis one does not reuire new keyword.
+ * Advocates having seperate objects, one for methods, and one for data.  Methods operate on methods.
+ * Functional programming is the solution for distributed computing.
+ */
+function constructor(spec) {
+  let { member } = spec;
+  // Gorilla problem.  With inheritance you only wanted banana but got the whole jungle
+  const { other } = other_constructor(spec);
+  const method = function () {
+    // spec, member, other, method
+  };
+  // not using 'this' and immutable
+  return Object.freeze({
+    method,
+    other
+  });
+}
