@@ -1,3 +1,5 @@
+// http://www.crockford.com/pp/problems.pptx
+
 function add(x, y) {
   return x + y;
 }
