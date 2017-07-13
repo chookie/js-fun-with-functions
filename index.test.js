@@ -104,6 +104,8 @@ describe('Write a function liftf that takes a binary function and makes it calla
 
 const twice = (binary) =>
   (arg) => binary(arg, arg);
+const doubl = twice(add);
+const square = twice(mul);
 
 describe('Write a function twice that takes a binary function and reutrns a unary function that passes its arg to the binary function twice', () => {
   it('add', () => {
@@ -111,12 +113,84 @@ describe('Write a function twice that takes a binary function and reutrns a unar
   });
 
   it('doubl', () => {
-    const doubl = twice(add);
     expect(doubl(11)).toBe(22);
   });
 
   it('square', () => {
-    const square = twice(mul);
     expect(square(11)).toBe(121);
+  });
+});
+
+
+const reverse = (binary) => {
+  return (first, second) => {
+    return binary(second, first);
+  }
+};
+describe('Write reverse, a function that reverses the args of a binary function', () => {
+  it('reverse', () => {
+    const bus = reverse(sub);
+
+    expect(bus(3, 2)).toBe(-1);
+  });
+});
+
+
+const composeu = (func1, func2) => {
+  return (value) => {
+    return func2(func1(value));
+  }
+}
+describe('Write a function composeu that takes two unary functions and returns a unary function that calls them both.', () => {
+  it('double and square', () => {
+    expect(composeu(doubl, square)(5)).toBe(100);
+  });
+});
+
+const composeb = (func1, func2) => {
+  return (first, second, third) => {
+    return func2(func1(first, second), third);
+  }
+}
+describe('Write a function compoaseb that takes 2 binary functions and returns a function that calls them both', () => {
+  it('add, mul', () => {
+    expect(composeb(add, mul)(2, 3, 7)).toBe(35);
+  });
+});
+
+
+const limit = (f, l) => (
+  x, y) => l-- > 0 ? f(x, y) : undefined
+const add_ltd = limit(add, 1);
+describe('Write a limit funciton that allows a binary funcion to be called a limited number of times', () => {
+  it('add ok', () => {
+    expect(add_ltd(3, 4)).toBe(7);
+  });
+  it('add undefined', () => {
+    expect(add_ltd(3, 5)).toBe(undefined);
+  });
+});
+
+const from = (start) => () => start++;
+describe('Write a from factory that produces a generator that will produce a series of values.', () => {
+  it('from 0', () => {
+    const gen = from(0);
+    expect(gen()).toBe(0);
+    expect(gen()).toBe(1);
+    expect(gen()).toBe(2);
+  });
+});
+
+const to = (func, limit) =>
+  () => {
+    const result = func();
+    return result >= limit ? undefined : result;
+  }
+describe('Write a to factory that takes a generator and an end value and returns a generator that will produce numbers up to but excluding that limit', () => {
+  it('from 3 to 5', () => {
+    const gen = to(from(3), 5);
+    expect(gen()).toBe(3);
+    expect(gen()).toBe(4);
+    expect(gen()).toBe(undefined);
   });
 });
