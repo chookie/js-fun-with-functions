@@ -223,8 +223,7 @@ describe('Write an elemnt factory that takes an array and a generator and return
 });
 
 
-const element2 = (array, func) => {
-  func = func ? func : fromTo(0, array.length);
+const element2 = (array, func = fromTo(0, array.length+1)) => {
   return () => {
     const idx = func();
     return idx === undefined ? undefined : array[idx];
