@@ -276,10 +276,10 @@ console.log('\n fromTo\n------');
 function fromTo(start, end) {
   return to(from(start), end);
 }
-const genft = fromTo(0, 3);
-console.log(genft());    // 0
+const genft = fromTo(1, 4);
 console.log(genft());    // 1
 console.log(genft());    // 2
+console.log(genft());    // 3
 console.log(genft());    // undefined
 
 

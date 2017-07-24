@@ -194,3 +194,50 @@ describe('Write a to factory that takes a generator and an end value and returns
     expect(gen()).toBe(undefined);
   });
 });
+
+const fromTo = (start, end) => to(from(start), end);
+describe('Write a fromTo factory that produces a generator that will produce values in a range', () => {
+  it('1 to 4', () => {
+    const gen = fromTo(1, 4);
+    expect(gen()).toBe(1);
+    expect(gen()).toBe(2);
+    expect(gen()).toBe(3);
+    expect(gen()).toBe(undefined);
+  });
+});
+
+// const element = (array, func) => () => array[func()];
+const element = (array, func) =>
+  () => {
+    const idx = func();
+    return idx === undefined ? undefined : array[idx];
+  }
+describe('Write an elemnt factory that takes an array and a generator and returns a generator that will produce elements from the array', () => {
+  it('a, b, c, d', () => {
+    const gen = element(['a', 'b', 'c', 'd'], fromTo(1, 3));
+
+    expect(gen()).toBe('b');
+    expect(gen()).toBe('c');
+    expect(gen()).toBe(undefined);
+  });
+});
+
+
+const element2 = (array, func) => {
+  func = func ? func : fromTo(0, array.length);
+  return () => {
+    const idx = func();
+    return idx === undefined ? undefined : array[idx];
+  }
+}
+describe('Modify the element factory so that the generator arg is optional.  If a generator is not provided then each of the elements odf the array will be produced.', () => {
+  it('no generator provided', () => {
+    const gen = element2(['a', 'b', 'c', 'd']);
+
+    expect(gen()).toBe('a');
+    expect(gen()).toBe('b');
+    expect(gen()).toBe('c');
+    expect(gen()).toBe('d');
+    expect(gen()).toBe(undefined);
+  });
+});
