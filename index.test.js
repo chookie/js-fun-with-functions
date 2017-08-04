@@ -223,7 +223,7 @@ describe('Write an elemnt factory that takes an array and a generator and return
 });
 
 
-const element2 = (array, func = fromTo(0, array.length+1)) => {
+const element2 = (array, func = fromTo(0, array.length + 1)) => {
   return () => {
     const idx = func();
     return idx === undefined ? undefined : array[idx];
@@ -237,6 +237,27 @@ describe('Modify the element factory so that the generator arg is optional.  If 
     expect(gen()).toBe('b');
     expect(gen()).toBe('c');
     expect(gen()).toBe('d');
+    expect(gen()).toBe(undefined);
+  });
+});
+
+const concat = (gen1, gen2) => {
+  return function () {
+    const result1 = gen1();
+    if (result1 === undefined) {
+      return gen2();
+    }
+    return result1;
+  }
+}
+describe('Write a concat factory that takes 2 generators and produces a generator that combines the sequences.', () => {
+  it('concat 2', () => {
+    const gen = concat(fromTo(0, 3), fromTo(0, 2));
+    expect(gen()).toBe(0);
+    expect(gen()).toBe(1);
+    expect(gen()).toBe(2);
+    expect(gen()).toBe(0);
+    expect(gen()).toBe(1);
     expect(gen()).toBe(undefined);
   });
 });
