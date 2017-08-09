@@ -423,7 +423,7 @@ console.log(gencon());    // undefined
 
 console.log('\n\gensymf\n------');
 /**
- * Make a facorty gensymf that makes generators that make unique symbols.
+ * Make a factory gensymf that makes generators that make unique symbols.
  */
 function gensymf(seed) {
   const map = {};
