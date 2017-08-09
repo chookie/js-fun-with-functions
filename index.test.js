@@ -261,3 +261,20 @@ describe('Write a concat factory that takes 2 generators and produces a generato
     expect(gen()).toBe(undefined);
   });
 });
+
+function gensymf(prefix) {
+  const gen = from(1);
+  return function () {
+    return `${prefix}${gen()}`
+  }
+}
+describe('Make a factory gensymf that makes generators that make unique symbols.', () => {
+  it('gensymf', () => {
+    let geng = gensymf('G');
+    let genh = gensymf('H');
+    expect(geng()).toBe('G1');
+    expect(genh()).toBe('H1');
+    expect(geng()).toBe('G2');
+    expect(genh()).toBe('H2');
+  });
+});
